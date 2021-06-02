@@ -5,16 +5,20 @@ class Author < ApplicationRecord
     format: { with: /(.+)@(.+)/, message: "Email invalid"  },
             uniqueness: { case_sensitive: false },
             length: { maximum: 254 }
-    validates_presence_of :first_name, :last_name
+    validates_presence_of :first_name, :last_name, :email
 
-    validate :valid_date_format         
+    validate :valid_date_format?         
 
-    def valid_date_format
-        if birth_date.present? 
+    def valid_date_format?
+        date_input = self.birth_date_before_type_cast
+        if date_input 
+
+            return true if date_input == ''
+
             begin
-            Date.parse(birth_date)
+            Date.parse(date_input)
             rescue => error
-                errors.add(:birth_date, error.message)
+                errors.add(:birth_date, "invalid date: #{date_input}")
             end
         end
     end
