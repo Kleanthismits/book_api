@@ -1,5 +1,5 @@
 class Publisher < ApplicationRecord
-    has_many :books
+  has_many :books
 
-    validates_presence_of :name
+  validates :name, presence: true
 end

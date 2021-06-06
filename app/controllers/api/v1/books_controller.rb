@@ -1,10 +1,10 @@
 module Api
   module V1
     class BooksController < ApplicationController
-      # @expenses = Expense.joins(:user).merge(User.order(:id)).paginate(:page => params[:page], :per_page => params[:per_page])
+      before_action :find_book
 
       def index
-        books = Book.includes(:author).order('authors.last_name, books.id').where.not(publisher: nil)
+        books = Book.includes(:author).order('authors.last_name, books.id desc').where.not(publisher: nil)
         render json: BooksRepresenter.new(books).as_json
       end
 
@@ -12,38 +12,43 @@ module Api
         book = Book.new(book_params)
 
         if book.save
-          render json: book, status: :created
+          render json: BookRepresenter.new(book).as_json, status: :created
         else
-          render json: {errors: book.errors}, status: :unprocessable_entity
+          render json: { errors: book.errors }, status: :unprocessable_entity
         end
+      end
+
+      def update
+        @book.update(book_params)
+        render json: BookRepresenter.new(@book).as_json
+      rescue ActiveRecord::RecordNotFound
+        render json: { errors: "No book with such id: #{params[:id]}" }
       end
 
       def show
-        begin
-          book = Book.find(params[:id])
-          render json: BookRepresenter.new(book).as_json
-        rescue ActiveRecord::RecordNotFound
-          render json: {errors: "No book with such id: #{params[:id]}"}
-        end
-        
+        render json: BookRepresenter.new(book_by_id).as_json
+      rescue ActiveRecord::RecordNotFound
+        render json: { errors: "No book with such id: #{params[:id]}" }
       end
 
       def destroy
-        begin
-          Book.find(params[:id]).destroy!
+        @book.destroy!
 
-          head :no_content
-        rescue ActiveRecord::NotFound
-          render json: {errors: "No book with such id: #{params[:id]}"}
-        end
-
+        head :no_content
+      rescue ActiveRecord::RecordNotFound
+        render json: { errors: "No book with such id: #{params[:id]}" }
       end
 
       private
 
       def book_params
-        params.require(:book).permit(:title, :description, :creation_date, :visibility_status, :isbn, :author_id, :publisher_id)
+        params.require(:book).permit(:title, :description, :creation_date, :visibility_status, :isbn, :author_id,
+                                     :publisher_id)
       end
-    end  
+
+      def find_book
+        @book = Book.find(params[:id])
+      end
+    end
   end
 end
