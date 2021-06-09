@@ -1,3 +1,4 @@
+# Representation of a book publisher when nested in a book json
 class BookPublisherPresenter
   def initialize(publisher)
     @publisher = publisher

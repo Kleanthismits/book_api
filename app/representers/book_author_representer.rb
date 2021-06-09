@@ -1,18 +1,27 @@
+# Representation of a book author when nested in a book json
 class BookAuthorRepresenter
   def initialize(author)
     @author = author
   end
 
   def as_json
-    bdate = author.birth_date
     {
-      name: "#{author.first_name} #{author.last_name}",
+      name: author_name,
       email: author.email,
-      birth_date: bdate ? "#{bdate.day.ordinalize} of #{Date::MONTHNAMES[bdate.month]} #{bdate.year}" : nil
+      birth_date: birth_date
     }
   end
 
   private
 
   attr_reader :author
+
+  def birth_date
+    bdate = author.birth_date
+    bdate ? "#{bdate.day.ordinalize} of #{Date::MONTHNAMES[bdate.month]} #{bdate.year}" : nil
+  end
+
+  def author_name
+    "#{author.first_name} #{author.last_name}"
+  end
 end

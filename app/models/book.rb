@@ -1,10 +1,11 @@
+#:nodoc:
 class Book < ApplicationRecord
   belongs_to :author, optional: true
   belongs_to :publisher, optional: true
 
-  validates :title, :isbn, presence: true
+  validates :title, :isbn, :author_id, presence: true
   validates :isbn, uniqueness: true
-  validates :author_id, numericality: { only_integer: true }
+  validates :author_id, numericality: { only_integer: true }, if: -> { !author_id.nil? }
   validates :publisher_id, numericality: { only_integer: true }, allow_nil: true
 
   validate :valid_date_format,
@@ -12,8 +13,6 @@ class Book < ApplicationRecord
            :valid_isbn_length,
            :author_id_is_valid,
            :publisher_id_is_valid
-
-  validate :valid_isbn_format, if: :isbnn_changed?, on: :update
 
   private
 
@@ -23,7 +22,7 @@ class Book < ApplicationRecord
     begin
       Date.parse(creation_date_before_type_cast)
     rescue Date::Error
-      errors.add(:creation_date, "invalid date: #{date_input}")
+      errors.add(:creation_date, "invalid date: #{creation_date_before_type_cast}")
     end
   end
 
@@ -36,12 +35,12 @@ class Book < ApplicationRecord
   end
 
   def author_id_is_valid
-    return if author_id.blank?
+    return if author_id.blank? || author_id.nil? || !author_id_before_type_cast.is_a?(Integer)
 
     begin
       Author.find(author_id)
-    rescue ActiveRecord::RecordNotFound => e
-      errors.add(:author, "No author with such id: #{author_id}")
+    rescue ActiveRecord::RecordNotFound
+      errors.add(:author_id, "No author with such id: #{author_id}")
     end
   end
 
@@ -50,13 +49,8 @@ class Book < ApplicationRecord
 
     begin
       Publisher.find(publisher_id)
-    rescue ActiveRecord::RecordNotFound => e
-      errors.add(:publisher, "No publisher with such id: #{publisher_id}")
+    rescue ActiveRecord::RecordNotFound
+      errors.add(:publisher_id, "No publisher with such id: #{publisher_id}")
     end
-  end
-
-  def isbnn_changed?
-    binding.pry
-
   end
 end

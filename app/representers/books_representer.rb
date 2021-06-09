@@ -1,3 +1,4 @@
+# Represtantion of a book for BookController#index method
 class BooksRepresenter
   def initialize(books)
     @books = books
@@ -8,9 +9,9 @@ class BooksRepresenter
       {
         id: book.id,
         title: book.title,
-        description: book.description ? book.description.truncate(100) : nil,
+        description: description(book),
         ISBN: book.isbn,
-        author: "#{book.author.first_name} #{book.author.last_name}"
+        author: author_name(book)
       }
     end
   end
@@ -18,4 +19,12 @@ class BooksRepresenter
   private
 
   attr_reader :books
+
+  def description(book)
+    book.description ? book.description.truncate(100) : nil
+  end
+
+  def author_name(book)
+    "#{book.author.first_name} #{book.author.last_name}"
+  end
 end

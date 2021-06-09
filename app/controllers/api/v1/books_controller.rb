@@ -1,7 +1,8 @@
 module Api
   module V1
+    #:nodoc:
     class BooksController < ApplicationController
-      before_action :find_book
+      before_action :find_book, except: %i[create index]
 
       def index
         books = Book.includes(:author).order('authors.last_name, books.id desc').where.not(publisher: nil)
@@ -10,7 +11,6 @@ module Api
 
       def create
         book = Book.new(book_params)
-
         if book.save
           render json: BookRepresenter.new(book).as_json, status: :created
         else
@@ -19,24 +19,23 @@ module Api
       end
 
       def update
-        @book.update(book_params)
-        render json: BookRepresenter.new(@book).as_json
-      rescue ActiveRecord::RecordNotFound
-        render json: { errors: "No book with such id: #{params[:id]}" }
+        @book.assign_attributes(book_params)
+
+        if @book.valid?
+          @book.update(book_params)
+          render json: BookRepresenter.new(@book).as_json
+        else
+          render json: { errors: @book.errors }
+        end
       end
 
       def show
-        render json: BookRepresenter.new(book_by_id).as_json
-      rescue ActiveRecord::RecordNotFound
-        render json: { errors: "No book with such id: #{params[:id]}" }
+        render json: BookRepresenter.new(@book).as_json
       end
 
       def destroy
-        @book.destroy!
-
+        @book.destroy
         head :no_content
-      rescue ActiveRecord::RecordNotFound
-        render json: { errors: "No book with such id: #{params[:id]}" }
       end
 
       private
@@ -48,6 +47,8 @@ module Api
 
       def find_book
         @book = Book.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        render json: { errors: "No book with such id: #{params[:id]}" }
       end
     end
   end

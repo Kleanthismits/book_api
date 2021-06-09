@@ -1,2 +1,6 @@
 require:
   - rubocop-rails
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Documentation:
+  Enabled: false
