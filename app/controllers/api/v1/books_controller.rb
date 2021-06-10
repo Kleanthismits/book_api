@@ -25,7 +25,7 @@ module Api
           @book.update(book_params)
           render json: BookRepresenter.new(@book).as_json
         else
-          render json: { errors: @book.errors }
+          render json: { errors: @book.errors }, status: :unprocessable_entity
         end
       end
 
@@ -48,7 +48,7 @@ module Api
       def find_book
         @book = Book.find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { errors: "No book with such id: #{params[:id]}" }
+        render json: { errors: "No book with such id: #{params[:id]}" }, status: :not_found
       end
     end
   end

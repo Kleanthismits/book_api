@@ -6,7 +6,7 @@ class Book < ApplicationRecord
   validates :title, :isbn, :author_id, presence: true
   validates :isbn, uniqueness: true
   validates :author_id, numericality: { only_integer: true }, if: -> { !author_id.nil? }
-  validates :publisher_id, numericality: { only_integer: true }, allow_nil: true
+  validates :publisher_id, numericality: { only_integer: true }, allow_nil: true, if: -> { !publisher_id.nil? }
 
   validate :valid_date_format,
            :valid_isbn_format,
@@ -45,7 +45,7 @@ class Book < ApplicationRecord
   end
 
   def publisher_id_is_valid
-    return if publisher_id.blank?
+    return if publisher_id.blank? || publisher_id.nil? || !publisher_id_before_type_cast.is_a?(Integer)
 
     begin
       Publisher.find(publisher_id)

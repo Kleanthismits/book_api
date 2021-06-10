@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/ClassLength
 require 'test_helper'
 
 class BookTest < ActiveSupport::TestCase
@@ -111,7 +112,36 @@ class BookTest < ActiveSupport::TestCase
     assert_equal ['must be an integer'], book.errors[:author_id]
   end
 
+  test 'should not save if an author with the author id provided does not exist' do
+    book.author_id = 1000
+    assert_not book.save
+    assert_not_empty book.errors[:author_id]
+    assert_equal ["No author with such id: #{book.author_id}"], book.errors[:author_id]
+  end
+
+  test 'should not save if publisher id not a number' do
+    book.publisher_id = 'yolo'
+    assert_not book.save
+    assert_not_empty book.errors[:publisher_id]
+    assert_equal ['is not a number'], book.errors[:publisher_id]
+  end
+
+  test 'should not save if publisher id not an integer' do
+    book.publisher_id = 1.5
+    assert_not book.save
+    assert_not_empty book.errors[:publisher_id]
+    assert_equal ['must be an integer'], book.errors[:publisher_id]
+  end
+
+  test 'should not save if a publisher with the publisher id provided does not exist' do
+    book.publisher_id = 1000
+    assert_not book.save
+    assert_not_empty book.errors[:publisher_id]
+    assert_equal ["No publisher with such id: #{book.publisher_id}"], book.errors[:publisher_id]
+  end
+
   private
 
   attr_accessor :book
 end
+# rubocop:enable Metrics/ClassLength

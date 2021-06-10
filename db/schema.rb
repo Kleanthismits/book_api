@@ -10,6 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+# rubocop:disable all
 ActiveRecord::Schema.define(version: 2021_06_09_114903) do
 
   # These are extensions that must be enabled in order to support this database
@@ -51,3 +52,4 @@ ActiveRecord::Schema.define(version: 2021_06_09_114903) do
   add_foreign_key "books", "authors"
   add_foreign_key "books", "publishers"
 end
+# rubocop:enable all

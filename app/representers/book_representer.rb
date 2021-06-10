@@ -9,7 +9,7 @@ class BookRepresenter
       title: book.title,
       description: book.description || nil,
       ISBN: book.isbn,
-      creation_date: book.creation_date,
+      creation_date: creation_date,
       author: author,
       publisher: publisher
     }
@@ -18,6 +18,11 @@ class BookRepresenter
   private
 
   attr_reader :book
+
+  def creation_date
+    cdate = book.creation_date
+    cdate ? cdate.strftime('%d/%m/%Y') : nil
+  end
 
   def author
     BookAuthorRepresenter.new(book.author).as_json
