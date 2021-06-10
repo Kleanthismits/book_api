@@ -7,7 +7,6 @@ class BooksRepresenter
   def as_json
     books.map do |book|
       {
-        id: book.id,
         title: book.title,
         description: description(book),
         ISBN: book.isbn,
