@@ -5,7 +5,7 @@ module Api
       before_action :find_book, except: %i[create index]
 
       def index
-        books = Book.includes(:author).order('authors.last_name, books.id desc').where.not(publisher: nil)
+        books = Book.published.ordered_by_author_last_name_book_id.for_books_representation
         render json: BooksRepresenter.new(books).as_json
       end
 

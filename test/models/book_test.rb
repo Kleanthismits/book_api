@@ -63,7 +63,7 @@ class BookTest < ActiveSupport::TestCase
     assert_equal ["invalid date: #{bdate}"], book.errors[:creation_date]
   end
 
-  test 'should not save if isbn isbn is not provided' do
+  test 'should not save if isbn is not provided' do
     book.isbn = nil
     assert_not book.save
     assert_not_empty book.errors[:isbn]

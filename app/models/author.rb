@@ -9,6 +9,10 @@ class Author < ApplicationRecord
 
   validate :valid_date_format?
 
+  def author_full_name
+    "#{first_name} #{last_name}"
+  end
+
   def valid_date_format?
     return if birth_date_before_type_cast.blank? || birth_date_before_type_cast.is_a?(Date)
 
