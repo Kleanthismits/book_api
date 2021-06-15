@@ -4,7 +4,7 @@ module Error
     def self.included(clazz)
       clazz.class_eval do
         rescue_from StandardError do |e|
-          render json: { errors: { message: e.to_s } }, status: :internal_server_error
+          render json: { errors: { message: e.message } }, status: :internal_server_error
         end
       end
     end
