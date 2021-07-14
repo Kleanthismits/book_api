@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Books', type: :request do
-  let!(:publishers) { create_list(:publisher, 10) }
+  # let!(:publishers) { create_list(:publisher, 10) }
   let!(:books) { create_list(:book, 30) }
   let(:book_id) { books.first.id }
   let(:base_path) { '/api/v1/' }
@@ -14,6 +14,7 @@ RSpec.describe 'Books', type: :request do
     before { get "#{base_path}books" }
 
     it 'returns books' do
+      binding.pry
       # 'json' is a custom helper to parse JSON responses
       expect(json).not_to be_empty
 
@@ -44,9 +45,12 @@ RSpec.describe 'Books', type: :request do
         expect(response).to have_http_status(404)
       end
 
-      it 'returns a not found message' do
-        expect(json['errors']).to match(/No book with such id: #{book_id}/)
+      it_behaves_like 'failure message' do
+        let(:message) { /No book with such id: #{book_id}/ }
       end
+      # it 'returns a not found message' do
+      #   expect(json['errors']).to match(/No book with such id: #{book_id}/)
+      # end
     end
   end
 
@@ -146,12 +150,13 @@ RSpec.describe 'Books', type: :request do
     context 'when the record does not exist' do
       let(:book_id) { 1000 }
       before { delete "#{base_path}/books/#{book_id}" }
+
       it 'returns status code 404' do
         expect(response).to have_http_status(404)
       end
 
-      it 'returns a not found message' do
-        expect(json['errors']).to match(/No book with such id: #{book_id}/)
+      it_behaves_like 'failure message' do
+        let(:message) { /No book with such id: #{book_id}/ }
       end
     end
   end
