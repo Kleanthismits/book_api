@@ -24,4 +24,8 @@ class BookAuthorRepresenter
   def author_name
     "#{author.first_name} #{author.last_name}"
   end
+
+  #test comment1
+  #test comment2
+  #test comment3
 end
